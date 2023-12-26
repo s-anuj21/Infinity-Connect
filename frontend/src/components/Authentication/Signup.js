@@ -1,4 +1,5 @@
 import React, { useState } from "react";
+import { useToast } from "@chakra-ui/react";
 import {
   FormControl,
   VStack,
@@ -8,6 +9,7 @@ import {
   InputRightElement,
   Button,
 } from "@chakra-ui/react";
+import { set } from "mongoose";
 function Signup() {
   const [show, setShow] = useState(false);
   const [name, setName] = useState("");
@@ -15,8 +17,62 @@ function Signup() {
   const [pic, setPic] = useState("");
   const [password, setPassword] = useState("");
   const [cpassword, setCpassword] = useState("");
+  const [loading, setLoading] = useState(false);
 
-  const postDetails = (pics) => {};
+  const toast = useToast();
+
+  const postDetails = async (pics) => {
+    setLoading(true);
+
+    if (pics === undefined) {
+      toast({
+        title: "Please Select an Image",
+        status: "warning",
+        duration: 5000,
+        isClosable: true,
+        position: "bottom",
+      });
+      return;
+    }
+
+    if (pics.type === "image/jpeg" || pics.type === "image/png") {
+      const data = new FormData();
+      data.append("file", pics);
+      data.append("upload_preset", "infinity-connect");
+      data.append("cloud_name", "dqhlrmd5l");
+
+      try {
+        const res = await fetch(
+          "https://api.cloudinary.com/v1_1/dqhlrmd5l/image/upload",
+          {
+            method: "post",
+            body: data,
+          }
+        );
+
+        const result = await res.json();
+        console.log(result.url.toString());
+        setPic(result.url.toString());
+        toast({
+          title: "Upload Successful!",
+          status: "success",
+          duration: 5000,
+          isClosable: true,
+          position: "bottom",
+        });
+      } catch (err) {
+        console.log(err);
+        toast({
+          title: "Failed to Upload",
+          status: "error",
+          duration: 5000,
+          isClosable: true,
+          position: "bottom",
+        });
+      }
+      setLoading(false);
+    }
+  };
   const submitHandler = () => {};
 
   const handleClick = () => setShow(!show);
@@ -77,6 +133,7 @@ function Signup() {
         width="100%"
         style={{ marginTop: 15, color: "#fff" }}
         onClick={() => submitHandler()}
+        isLoading={loading}
       >
         Sign Up
       </Button>
