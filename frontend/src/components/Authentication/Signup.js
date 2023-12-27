@@ -1,4 +1,6 @@
 import React, { useState } from "react";
+import { useHistory } from "react-router-dom";
+
 import { useToast } from "@chakra-ui/react";
 import {
   FormControl,
@@ -9,9 +11,12 @@ import {
   InputRightElement,
   Button,
 } from "@chakra-ui/react";
-import { set } from "mongoose";
+import axios from "axios";
+
 function Signup() {
   const [show, setShow] = useState(false);
+  const history = useHistory();
+
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [pic, setPic] = useState("");
@@ -73,7 +78,61 @@ function Signup() {
       setLoading(false);
     }
   };
-  const submitHandler = () => {};
+  const submitHandler = async () => {
+    setLoading(true);
+    if (!name || !email || !password || !cpassword) {
+      toast({
+        title: "Please fill all the details",
+        status: "error",
+        duration: 5000,
+        isClosable: true,
+        position: "bottom",
+      });
+    }
+
+    if (password !== cpassword) {
+      toast({
+        title: "Passwords do not match",
+        status: "error",
+        duration: 5000,
+        isClosable: true,
+        position: "bottom",
+      });
+    }
+
+    const data = {
+      name,
+      email,
+      password,
+      pic,
+    };
+
+    try {
+      const res = await axios({
+        method: "post",
+        url: "/api/user",
+        data,
+        headers: {
+          "Content-Type": "application/json",
+        },
+      });
+
+      toast({
+        title: "Registration Successful!",
+        status: "success",
+        duration: 5000,
+        isClosable: true,
+        position: "bottom",
+      });
+
+      localStorage.setItem("user_info", JSON.stringify(res.data));
+
+      setLoading(false);
+      history.push("/chats");
+    } catch (err) {
+      console.log(err);
+    }
+  };
 
   const handleClick = () => setShow(!show);
   return (
