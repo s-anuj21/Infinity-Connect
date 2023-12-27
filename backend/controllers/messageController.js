@@ -8,11 +8,9 @@ const Chat = require("../models/ChatModel");
  */
 
 const getAllMessages = asyncHandler(async (req, res) => {
-  const messages = await Message.find({ chat: req.params.chatId }).populate(
-    "sender",
-    "name",
-    "profilePic"
-  );
+  const messages = await Message.find({ chat: req.params.chatId })
+    .populate("sender", "name email profilePic")
+    .populate("chat");
 
   res.json(messages);
 });
@@ -36,15 +34,23 @@ const sendMessage = asyncHandler(async (req, res) => {
     chat: chatId,
   };
 
-  const message = await Message.create(data).populate(
-    "sender name profilePic chat"
-  );
+  let message = await Message.create(data);
+  message = await Message.find({ _id: message._id })
+    .populate("sender", "name email profilePic")
+    .populate("chat");
+
+  message = await User.populate(message, {
+    path: "chat.users",
+    select: "name profilePic email",
+  });
+
+  await Chat.findByIdAndUpdate(chatId, { latestMessage: message._id });
 
   await Chat.findByIdAndUpdate(chatId, {
     latestMessage: message._id,
   });
 
-  res.json(message);
+  res.json(201).json(message);
 });
 
 module.exports = { getAllMessages, sendMessage };

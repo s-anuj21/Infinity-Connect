@@ -68,13 +68,24 @@ const loginUser = asyncHandler(async (req, res) => {
 });
 
 /**
-    @description Get all users
-    @route GET /api/user
+    @description Get or Search all users
+    @route GET /api/user?serach=
  */
 const getAllUser = asyncHandler(async (req, res) => {
-  const users = await User.find({});
+  const keyword = {};
 
-  res.json(users);
+  if (req.query.search) {
+    keyword = {
+      $or: [
+        { name: { $regex: req.query.search, $options: "i" } },
+        { email: { $regex: req.query.search, $options: "i" } },
+      ],
+    };
+  }
+
+  const users = await User.find({ ...keyword }, { id: { $ne: req.user._id } });
+
+  res.status(200).json(users);
 });
 
 module.exports = { getAllUser, registerUser, loginUser };
