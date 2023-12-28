@@ -1,5 +1,6 @@
 const asyncHandler = require("express-async-handler");
-const Chat = require("../models/ChatModel");
+const Chat = require("../models/chatModel");
+const User = require("../models/userModel");
 
 const chatsData = require("../res/data");
 
@@ -16,7 +17,7 @@ const accessChat = asyncHandler(async (req, res) => {
     throw new Error("Please provide a userId");
   }
 
-  const chats = await Chat.find({
+  let chats = await Chat.find({
     isGroupChat: false,
     $and: [
       { users: { $elemMatch: { $eq: req.user._id } } },
@@ -48,7 +49,7 @@ const accessChat = asyncHandler(async (req, res) => {
     "-password"
   );
 
-  res.status(200).json(newChat);
+  res.status(200).json(createdChat);
 });
 
 /**

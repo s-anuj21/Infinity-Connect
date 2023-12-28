@@ -69,10 +69,10 @@ const loginUser = asyncHandler(async (req, res) => {
 
 /**
     @description Get or Search all users
-    @route GET /api/user?serach=
+    @route GET /api/user?search=
  */
 const getAllUser = asyncHandler(async (req, res) => {
-  const keyword = {};
+  let keyword = {};
 
   if (req.query.search) {
     keyword = {
@@ -82,8 +82,7 @@ const getAllUser = asyncHandler(async (req, res) => {
       ],
     };
   }
-
-  const users = await User.find({ ...keyword }, { id: { $ne: req.user._id } });
+  const users = await User.find({ ...keyword, id: { $ne: req.user._id } });
 
   res.status(200).json(users);
 });

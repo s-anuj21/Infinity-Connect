@@ -104,7 +104,7 @@ function Signup() {
       name,
       email,
       password,
-      pic,
+      profilePic: pic,
     };
 
     try {
