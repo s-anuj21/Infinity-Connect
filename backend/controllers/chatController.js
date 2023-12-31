@@ -81,6 +81,7 @@ const fetchChats = asyncHandler(async (req, res) => {
 const createGroup = asyncHandler(async (req, res) => {
   if (!req.body.users || !req.body.chatName) {
     res.status(400);
+    console.log(req.body);
     throw new Error("Please fill all details");
   }
 
@@ -94,7 +95,7 @@ const createGroup = asyncHandler(async (req, res) => {
     groupAdmin: req.user._id,
   });
 
-  groupChat = await Chat.find({ _id: group._id })
+  groupChat = await Chat.find({ _id: groupChat._id })
     .populate("users", "-password")
     .populate("groupAdmin", "-password");
 

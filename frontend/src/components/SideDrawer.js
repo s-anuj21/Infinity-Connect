@@ -29,11 +29,10 @@ import { Spinner } from "@chakra-ui/spinner";
 import ProfileModal from "./Utilities/ProfileModal";
 import NotificationBadge from "react-notification-badge";
 import { Effect } from "react-notification-badge";
-// import { getSender } from "../../config/ChatLogics";
-// import UserListItem from "../userAvatar/UserListItem";
+import { getSender } from "../config/ChatLogics";
+import UserListItem from "./Utilities/UserListItem";
 import { ChatState } from "./Context/ChatProvider";
 import ChatLoading from "./Utilities/ChatLoading";
-import UserListItem from "./Utilities/UserListItem";
 
 function SideDrawer() {
   const [searchQuery, setSearchQuery] = useState("");
@@ -206,7 +205,7 @@ function SideDrawer() {
         </div>
       </Box>
 
-      {/* Done with the Navigation Bar */}
+      {/* Navigation Bar Ends Here */}
 
       <Drawer placement="left" onClose={onClose} isOpen={isOpen}>
         <DrawerOverlay />
