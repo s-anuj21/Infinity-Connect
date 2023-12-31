@@ -104,13 +104,13 @@ const createGroup = asyncHandler(async (req, res) => {
 
 /**
  * @description Add user to group
- * @route PUT /api/chat/addToGroup
+ * @route PUT /api/chat/rename
  */
 
 const renameGroup = asyncHandler(async (req, res) => {
   const { chatId, chatName } = req.body;
-  const updatedGroup = await Chat.findAndUpdate(
-    { _id: chatId },
+  const updatedGroup = await Chat.findByIdAndUpdate(
+    chatId,
     { chatName },
     { new: true }
   )
@@ -122,7 +122,7 @@ const renameGroup = asyncHandler(async (req, res) => {
     throw new Error("Group not found");
   }
 
-  res.status(200).json(updatedChat);
+  res.status(200).json(updatedGroup);
 });
 
 /**
@@ -131,12 +131,10 @@ const renameGroup = asyncHandler(async (req, res) => {
  */
 
 const addToGroup = asyncHandler(async (req, res) => {
-  const { userId } = req.body;
+  const { userId, chatId } = req.body;
 
-  const updatedGroup = await Chat.findAndUpdate(
-    {
-      _id: userId,
-    },
+  const updatedGroup = await Chat.findByIdAndUpdate(
+    chatId,
     { $push: { users: userId } },
     {
       new: true,
@@ -159,12 +157,11 @@ const addToGroup = asyncHandler(async (req, res) => {
  
  */
 const removeFromGroup = asyncHandler(async (req, res) => {
-  const { userId } = req.body;
+  const { userId, chatId } = req.body;
 
-  const updatedGroup = await Chat.findAndUpdate(
-    {
-      _id: userId,
-    },
+  const updatedGroup = await Chat.findByIdAndUpdate(
+    chatId,
+
     { $pull: { users: userId } },
     {
       new: true,

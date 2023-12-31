@@ -17,8 +17,8 @@ import {
 import axios from "axios";
 import { useState } from "react";
 import { ChatState } from "../Context/ChatProvider";
-import UserListItem from "./UserListItem";
-import UserBadgeItem from "./UserBadgeItem";
+import UserListItem from "../Utilities/UserListItem";
+import UserBadgeItem from "../Utilities/UserBadgeItem";
 // import UserBadgeItem from "../userAvatar/UserBadgeItem";
 // import UserListItem from "../userAvatar/UserListItem";
 
@@ -61,7 +61,6 @@ function GroupChatModal({ children }) {
         },
       });
 
-      setLoading(false);
       setSearchResult(res.data);
     } catch (err) {
       toast({
@@ -72,6 +71,8 @@ function GroupChatModal({ children }) {
         position: "bottom",
       });
     }
+
+    setLoading(false);
   };
 
   /**
@@ -80,7 +81,7 @@ function GroupChatModal({ children }) {
    */
   const handleDelete = (userToDelete) => {
     setSelectedUsers(
-      selectedUsers.filter((user) => userToDelete._id !== userToDelete._id)
+      selectedUsers.filter((user) => user._id !== userToDelete._id)
     );
   };
 
@@ -114,6 +115,7 @@ function GroupChatModal({ children }) {
         method: "POST",
         headers: {
           Authorization: `Bearer ${user.token}`,
+          "Content-Type": "application/json",
         },
 
         data: {

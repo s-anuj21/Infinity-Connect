@@ -6,7 +6,7 @@ import axios from "axios";
 import { useEffect, useState } from "react";
 import { getSender } from "../config/ChatLogics";
 import ChatLoading from "./Utilities/ChatLoading";
-import GroupChatModal from "./Utilities/GroupChatModal";
+import GroupChatModal from "./Modals/GroupChatModal";
 import { Button } from "@chakra-ui/react";
 import { ChatState } from "./Context/ChatProvider";
 
@@ -40,6 +40,8 @@ function MyChats({ fetchAgain }) {
   useEffect(() => {
     fetchChats();
   }, [fetchAgain]);
+  // This fetchAgain is used to fetch chats again and will update chats variable when a new msg or chat will be created
+  // And this value will be changed in chatbox component
 
   return (
     <Box

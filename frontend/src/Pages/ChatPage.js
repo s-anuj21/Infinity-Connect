@@ -9,6 +9,8 @@ import Chatbox from "../components/Chatbox";
 function ChatPage() {
   const { user } = ChatState();
   const [fetchAgain, setFetchAgain] = useState(false);
+  // This will be used to just re-render the chatbox component, after any changes in chats or messages
+
   return (
     <div style={{ width: "100%" }}>
       {user && <SideDrawer />}

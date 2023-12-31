@@ -26,7 +26,7 @@ import axios from "axios";
 import { useToast } from "@chakra-ui/toast";
 // import ChatLoading from "../ChatLoading";
 import { Spinner } from "@chakra-ui/spinner";
-import ProfileModal from "./Utilities/ProfileModal";
+import ProfileModal from "./Modals/ProfileModal";
 import NotificationBadge from "react-notification-badge";
 import { Effect } from "react-notification-badge";
 import { getSender } from "../config/ChatLogics";
@@ -109,8 +109,6 @@ function SideDrawer() {
           Authorization: `Bearer ${user.token}`,
         },
       });
-
-      console.log(res.data);
 
       // If this Chat is not already in the chats array, then add it --> This happens for first time chat
       if (!chats.find((chat) => chat._id === res.data._id)) {
