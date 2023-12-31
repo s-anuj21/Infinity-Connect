@@ -10,8 +10,36 @@ import GroupChatModal from "./Utilities/GroupChatModal";
 import { Button } from "@chakra-ui/react";
 import { ChatState } from "./Context/ChatProvider";
 
-function MyChats() {
+function MyChats({ fetchAgain }) {
   const { user, selectedChat, setSelectedChat, chats, setChats } = ChatState();
+  const toast = useToast();
+
+  const fetchChats = async () => {
+    try {
+      console.log("fetching chats");
+      const { data } = await axios({
+        url: `/api/chat`,
+        method: "GET",
+        headers: {
+          Authorization: `Bearer ${user.token}`,
+        },
+      });
+      setChats(data);
+    } catch (err) {
+      toast({
+        title: err.response.data.message,
+        description: "Failed to load chats",
+        status: "error",
+        duration: 5000,
+        isClosable: true,
+        position: "bottom",
+      });
+    }
+  };
+
+  useEffect(() => {
+    fetchChats();
+  }, [fetchAgain]);
 
   return (
     <Box
@@ -69,7 +97,9 @@ function MyChats() {
                 key={chat._id}
               >
                 <Text>
-                  {chat.isGroupChat ? chat.chatName : getSender(user, chat)}
+                  {chat.isGroupChat
+                    ? chat.chatName
+                    : getSender(user, chat.users)}
                 </Text>
                 {/* {chat.latestMessage && (
                   <Text fontSize="xs">
