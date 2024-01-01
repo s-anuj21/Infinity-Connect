@@ -3,28 +3,66 @@ import { FormControl } from "@chakra-ui/form-control";
 import { Input } from "@chakra-ui/input";
 import { Box, Text } from "@chakra-ui/layout";
 import "./style.css";
-import { IconButton, Spinner, useToast } from "@chakra-ui/react";
+import { IconButton, Spinner, defineCssVars, useToast } from "@chakra-ui/react";
 import { getSender, getSenderFull } from "../config/ChatLogics";
 import { useEffect, useState } from "react";
 import axios from "axios";
 import { ArrowBackIcon } from "@chakra-ui/icons";
 import ProfileModal from "./Modals/ProfileModal";
 import ScrollableChat from "./ScrollableChat";
-// import Lottie from "react-lottie";
-// import animationData from "../animations/typing.json";
+import Lottie from "lottie-react";
+import animationData from "./animations/typing.json";
 
 // import io from "socket.io-client";
 import { ChatState } from "./Context/ChatProvider";
 import UpdateGroupChatModal from "./Modals/UpdateGroupChatModel";
 import { set } from "mongoose";
+import io from "socket.io-client";
+
+const ENDPOINT = "http://localhost:5000";
+let socket, selectedChatCompare, setTimeoutID;
+
 function SingleChat({ fetchAgain, setFetchAgain }) {
   const [loading, setLoading] = useState(false);
   const [messages, setMessages] = useState();
   const [newMessage, setNewMessage] = useState();
+  const [socketConnected, setSocketConnected] = useState(false);
+
+  // This variable is used for typing indicator
+  const [istyping, setIstyping] = useState(false);
+
+  // This variable is used for user who is typing
+  const [typing, setTyping] = useState(false);
 
   const { user, selectedChat, setSelectedChat } = ChatState();
 
   const toast = useToast();
+
+  const defaultOptionsAnimation = {
+    loop: true,
+    autoplay: true,
+    animationData: animationData,
+    rendererSettings: {
+      preserveAspectRatio: "xMidYMid slice",
+    },
+  };
+
+  // Setting up Socket IO
+  useEffect(() => {
+    socket = io(ENDPOINT);
+    socket.emit("setup", user);
+    socket.on("connected", () => {
+      setSocketConnected(true);
+    });
+
+    socket.on("typing", () => {
+      setIstyping(true);
+    });
+
+    socket.on("stop typing", () => {
+      setIstyping(false);
+    });
+  }, []);
 
   /**
    * @description Fetching Messages of Selected Chat
@@ -43,6 +81,9 @@ function SingleChat({ fetchAgain, setFetchAgain }) {
       });
 
       setMessages(data);
+
+      // Socket IO Stuff
+      socket.emit("join chat", selectedChat._id);
     } catch (err) {
       //   console.log(err);
       toast({
@@ -58,7 +99,8 @@ function SingleChat({ fetchAgain, setFetchAgain }) {
 
   const sendMessage = async (e) => {
     if (e.key !== "Enter" || !newMessage) return;
-    console.log(e.key);
+
+    socket.emit("stop typing", selectedChat._id);
 
     try {
       const { data } = await axios({
@@ -76,6 +118,7 @@ function SingleChat({ fetchAgain, setFetchAgain }) {
 
       setNewMessage("");
       setMessages([...messages, data[0]]);
+      socket.emit("new message", data[0]);
     } catch (err) {
       toast({
         title: "Error Sending Message",
@@ -89,11 +132,59 @@ function SingleChat({ fetchAgain, setFetchAgain }) {
 
   const typingHandler = async (e) => {
     setNewMessage(e.target.value);
+
+    // Typing Indicator Logic
+    console.log(socket);
+    if (!socketConnected) return;
+
+    if (!typing) {
+      setTyping(true);
+      socket.emit("typing", selectedChat._id);
+    }
+
+    let lastTypedTime = new Date().getTime();
+    const typingInterval = 3000;
+
+    setTimeoutID = setTimeout(() => {
+      let timeNow = new Date().getTime();
+      let timeDiff = timeNow - lastTypedTime;
+      console.log(timeDiff);
+
+      if (timeDiff >= typingInterval && typing) {
+        socket.emit("stop typing", selectedChat._id);
+        setTyping(false);
+      }
+
+      stopCheckingTyping();
+    }, typingInterval);
+  };
+
+  // Clearing Timeout
+  const stopCheckingTyping = () => {
+    if (setTimeoutID) {
+      clearTimeout(setTimeoutID);
+    }
   };
 
   useEffect(() => {
     fetchMessages();
+    // This variable is used to decide whether to give notification or not
+    selectedChatCompare = selectedChat;
   }, [selectedChat]);
+
+  useEffect(() => {
+    socket.on("message received", (newMessageRecieved) => {
+      console.log("new message recieved", newMessageRecieved);
+      if (
+        !selectedChatCompare ||
+        selectedChatCompare._id !== newMessageRecieved.chat._id
+      ) {
+        // Give Notification
+      } else {
+        setMessages([...messages, newMessageRecieved]);
+      }
+    });
+  });
 
   return (
     <>
@@ -161,18 +252,19 @@ function SingleChat({ fetchAgain, setFetchAgain }) {
               isRequired
               mt={3}
             >
-              {/* {istyping ? (
+              {istyping ? (
                 <div>
-                  <Lottie
-                    options={defaultOptions}
-                    // height={50}
+                  Typing....
+                  {/* <Lottie
+                    options={defaultOptionsAnimation}
+                    height={50}
                     width={70}
                     style={{ marginBottom: 15, marginLeft: 0 }}
-                  />
+                  /> */}
                 </div>
               ) : (
                 <></>
-              )} */}
+              )}
               <Input
                 variant="filled"
                 bg="#E0E0E0"
