@@ -16,7 +16,6 @@ function MyChats({ fetchAgain }) {
 
   const fetchChats = async () => {
     try {
-      console.log("fetching chats");
       const { data } = await axios({
         url: `/api/chat`,
         method: "GET",

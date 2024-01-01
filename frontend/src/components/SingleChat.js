@@ -2,27 +2,98 @@ import React from "react";
 import { FormControl } from "@chakra-ui/form-control";
 import { Input } from "@chakra-ui/input";
 import { Box, Text } from "@chakra-ui/layout";
-// import "./styles.css";
+import "./style.css";
 import { IconButton, Spinner, useToast } from "@chakra-ui/react";
 import { getSender, getSenderFull } from "../config/ChatLogics";
 import { useEffect, useState } from "react";
 import axios from "axios";
 import { ArrowBackIcon } from "@chakra-ui/icons";
 import ProfileModal from "./Modals/ProfileModal";
-// import ScrollableChat from "./ScrollableChat";
+import ScrollableChat from "./ScrollableChat";
 // import Lottie from "react-lottie";
 // import animationData from "../animations/typing.json";
 
 // import io from "socket.io-client";
 import { ChatState } from "./Context/ChatProvider";
 import UpdateGroupChatModal from "./Modals/UpdateGroupChatModel";
+import { set } from "mongoose";
 function SingleChat({ fetchAgain, setFetchAgain }) {
-  const { loading, setLoading } = useState();
-  const { messages, setMessages } = useState();
+  const [loading, setLoading] = useState(false);
+  const [messages, setMessages] = useState();
+  const [newMessage, setNewMessage] = useState();
 
-  const fetchMessages = async () => {};
+  const { user, selectedChat, setSelectedChat } = ChatState();
 
-  const { user, selectedChat, setSelectedChat, chats, setChats } = ChatState();
+  const toast = useToast();
+
+  /**
+   * @description Fetching Messages of Selected Chat
+   */
+  const fetchMessages = async () => {
+    if (!selectedChat) return;
+
+    try {
+      setLoading(true);
+      const { data } = await axios({
+        url: `/api/message/${selectedChat._id}`,
+        method: "GET",
+        headers: {
+          Authorization: `Bearer ${user.token}`,
+        },
+      });
+
+      setMessages(data);
+    } catch (err) {
+      //   console.log(err);
+      toast({
+        title: "Error Fetching Messages",
+        status: "error",
+        duration: 5000,
+        isClosable: true,
+        position: "bottom",
+      });
+    }
+    setLoading(false);
+  };
+
+  const sendMessage = async (e) => {
+    if (e.key !== "Enter" || !newMessage) return;
+    console.log(e.key);
+
+    try {
+      const { data } = await axios({
+        url: `/api/message`,
+        method: "POST",
+        headers: {
+          Authorization: `Bearer ${user.token}`,
+          "Content-Type": "application/json",
+        },
+        data: {
+          content: newMessage,
+          chatId: selectedChat._id,
+        },
+      });
+
+      setNewMessage("");
+      setMessages([...messages, data[0]]);
+    } catch (err) {
+      toast({
+        title: "Error Sending Message",
+        status: "error",
+        duration: 5000,
+        isClosable: true,
+        position: "bottom",
+      });
+    }
+  };
+
+  const typingHandler = async (e) => {
+    setNewMessage(e.target.value);
+  };
+
+  useEffect(() => {
+    fetchMessages();
+  }, [selectedChat]);
 
   return (
     <>
@@ -43,28 +114,21 @@ function SingleChat({ fetchAgain, setFetchAgain }) {
               icon={<ArrowBackIcon />}
               onClick={() => setSelectedChat("")}
             />
-            {
-              // messages
-
-              // &&
-              !selectedChat.isGroupChat ? (
-                <>
-                  {getSender(user, selectedChat.users)}
-                  <ProfileModal
-                    user={getSenderFull(user, selectedChat.users)}
-                  />
-                </>
-              ) : (
-                <>
-                  {selectedChat.chatName.toUpperCase()}
-                  <UpdateGroupChatModal
-                    fetchMessages={fetchMessages}
-                    fetchAgain={fetchAgain}
-                    setFetchAgain={setFetchAgain}
-                  />
-                </>
-              )
-            }
+            {messages && !selectedChat.isGroupChat ? (
+              <>
+                {getSender(user, selectedChat.users)}
+                <ProfileModal user={getSenderFull(user, selectedChat.users)} />
+              </>
+            ) : (
+              <>
+                {selectedChat.chatName.toUpperCase()}
+                <UpdateGroupChatModal
+                  fetchMessages={fetchMessages}
+                  fetchAgain={fetchAgain}
+                  setFetchAgain={setFetchAgain}
+                />
+              </>
+            )}
           </Text>
           <Box
             display="flex"
@@ -77,7 +141,6 @@ function SingleChat({ fetchAgain, setFetchAgain }) {
             borderRadius="lg"
             overflowY="hidden"
           >
-            {/*
             {loading ? (
               <Spinner
                 size="xl"
@@ -98,7 +161,7 @@ function SingleChat({ fetchAgain, setFetchAgain }) {
               isRequired
               mt={3}
             >
-              {istyping ? (
+              {/* {istyping ? (
                 <div>
                   <Lottie
                     options={defaultOptions}
@@ -109,7 +172,7 @@ function SingleChat({ fetchAgain, setFetchAgain }) {
                 </div>
               ) : (
                 <></>
-              )}
+              )} */}
               <Input
                 variant="filled"
                 bg="#E0E0E0"
@@ -118,7 +181,6 @@ function SingleChat({ fetchAgain, setFetchAgain }) {
                 onChange={typingHandler}
               />
             </FormControl>
-            */}
           </Box>
         </>
       ) : (
