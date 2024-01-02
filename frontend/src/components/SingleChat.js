@@ -38,15 +38,6 @@ function SingleChat({ fetchAgain, setFetchAgain }) {
 
   const toast = useToast();
 
-  const defaultOptionsAnimation = {
-    loop: true,
-    autoplay: true,
-    animationData: animationData,
-    rendererSettings: {
-      preserveAspectRatio: "xMidYMid slice",
-    },
-  };
-
   // Setting up Socket IO
   useEffect(() => {
     socket = io(ENDPOINT);
@@ -134,7 +125,6 @@ function SingleChat({ fetchAgain, setFetchAgain }) {
     setNewMessage(e.target.value);
 
     // Typing Indicator Logic
-    console.log(socket);
     if (!socketConnected) return;
 
     if (!typing) {
@@ -142,25 +132,18 @@ function SingleChat({ fetchAgain, setFetchAgain }) {
       socket.emit("typing", selectedChat._id);
     }
 
-    let lastTypedTime = new Date().getTime();
     const typingInterval = 3000;
 
     setTimeoutID = setTimeout(() => {
-      let timeNow = new Date().getTime();
-      let timeDiff = timeNow - lastTypedTime;
-      console.log(timeDiff);
+      socket.emit("stop typing", selectedChat._id);
+      setTyping(false);
 
-      if (timeDiff >= typingInterval && typing) {
-        socket.emit("stop typing", selectedChat._id);
-        setTyping(false);
-      }
-
-      stopCheckingTyping();
+      clearTypingTimeout();
     }, typingInterval);
   };
 
   // Clearing Timeout
-  const stopCheckingTyping = () => {
+  const clearTypingTimeout = () => {
     if (setTimeoutID) {
       clearTimeout(setTimeoutID);
     }
@@ -254,13 +237,15 @@ function SingleChat({ fetchAgain, setFetchAgain }) {
             >
               {istyping ? (
                 <div>
-                  Typing....
-                  {/* <Lottie
-                    options={defaultOptionsAnimation}
-                    height={50}
-                    width={70}
-                    style={{ marginBottom: 15, marginLeft: 0 }}
-                  /> */}
+                  <Lottie
+                    animationData={animationData}
+                    style={{
+                      marginBottom: 15,
+                      marginLeft: 0,
+                      height: 50,
+                      width: 70,
+                    }}
+                  />
                 </div>
               ) : (
                 <></>
