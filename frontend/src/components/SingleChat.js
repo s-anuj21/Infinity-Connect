@@ -13,10 +13,9 @@ import ScrollableChat from "./ScrollableChat";
 import Lottie from "lottie-react";
 import animationData from "./animations/typing.json";
 
-// import io from "socket.io-client";
 import { ChatState } from "./Context/ChatProvider";
 import UpdateGroupChatModal from "./Modals/UpdateGroupChatModel";
-import { set } from "mongoose";
+
 import io from "socket.io-client";
 
 const ENDPOINT = "http://localhost:5000";
@@ -34,7 +33,8 @@ function SingleChat({ fetchAgain, setFetchAgain }) {
   // This variable is used for user who is typing
   const [typing, setTyping] = useState(false);
 
-  const { user, selectedChat, setSelectedChat } = ChatState();
+  const { user, selectedChat, setSelectedChat, notification, setNotification } =
+    ChatState();
 
   const toast = useToast();
 
@@ -163,6 +163,8 @@ function SingleChat({ fetchAgain, setFetchAgain }) {
         selectedChatCompare._id !== newMessageRecieved.chat._id
       ) {
         // Give Notification
+        setNotification([newMessageRecieved, ...notification]);
+        setFetchAgain(!fetchAgain); // Refreshing
       } else {
         setMessages([...messages, newMessageRecieved]);
       }

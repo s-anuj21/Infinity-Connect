@@ -27,8 +27,8 @@ import { useToast } from "@chakra-ui/toast";
 // import ChatLoading from "../ChatLoading";
 import { Spinner } from "@chakra-ui/spinner";
 import ProfileModal from "./Modals/ProfileModal";
-// import NotificationBadge from "react-notification-badge";
-// // import { Effect } from "react-notification-badge";
+import NotificationBadge from "react-notification-badge";
+import { Effect } from "react-notification-badge";
 import { getSender } from "../config/ChatLogics";
 import UserListItem from "./Utilities/UserListItem";
 import { ChatState } from "./Context/ChatProvider";
@@ -40,7 +40,14 @@ function SideDrawer() {
   const [loading, setLoading] = useState(false);
   const [loadingChat, setLoadingChat] = useState(false);
 
-  const { user, setSelectedChat, chats, setChats } = ChatState();
+  const {
+    user,
+    setSelectedChat,
+    chats,
+    setChats,
+    notification,
+    setNotification,
+  } = ChatState();
   const history = useHistory();
 
   const { onOpen, onClose, isOpen } = useDisclosure();
@@ -155,7 +162,7 @@ function SideDrawer() {
         </Text>
 
         <div>
-          {/*       For Notification
+          {/*  For Notification */}
           <Menu>
             <MenuButton p={1}>
               <NotificationBadge
@@ -171,7 +178,11 @@ function SideDrawer() {
                   key={notif._id}
                   onClick={() => {
                     setSelectedChat(notif.chat);
-                    setNotification(notification.filter((n) => n !== notif));
+                    setNotification(
+                      notification.filter(
+                        (item) => notif.chatId !== item.chatId
+                      )
+                    );
                   }}
                 >
                   {notif.chat.isGroupChat
@@ -180,8 +191,7 @@ function SideDrawer() {
                 </MenuItem>
               ))}
             </MenuList>
-          </Menu> 
-          */}
+          </Menu>
 
           <Menu>
             <MenuButton as={Button} bg="white" rightIcon={<ChevronDownIcon />}>
