@@ -28,7 +28,7 @@ function HomePage() {
         borderWidth="1px"
       >
         <Text fontFamily="Work sans" fontSize="1.6rem" fontWeight={900}>
-          The Modern Chat App
+          Infinity-Connect
         </Text>
       </Box>
 

@@ -54,7 +54,6 @@ io.on("connection", (socket) => {
 
   socket.on("join chat", (room) => {
     socket.join(room);
-    console.log("User joined room", room);
   });
 
   socket.on("typing", (room) => {
@@ -74,5 +73,10 @@ io.on("connection", (socket) => {
       if (user._id === newMessageRecieved.sender._id) return;
       socket.in(user._id).emit("message received", newMessageRecieved);
     });
+  });
+
+  socket.off("setup", (user) => {
+    console.log("USER DISCONNECTED");
+    socket.leave(user._id);
   });
 });
