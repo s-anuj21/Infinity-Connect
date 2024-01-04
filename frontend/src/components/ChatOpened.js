@@ -21,8 +21,8 @@ let socket, selectedChatCompare, setTimeoutID;
 
 function ChatOpened({ fetchAgain, setFetchAgain }) {
   const [loading, setLoading] = useState(false);
-  const [messages, setMessages] = useState();
-  const [newMessage, setNewMessage] = useState();
+  const [messages, setMessages] = useState([]);
+  const [newMessage, setNewMessage] = useState("");
   const [socketConnected, setSocketConnected] = useState(false);
 
   // This variable is used for typing indicator
@@ -36,7 +36,7 @@ function ChatOpened({ fetchAgain, setFetchAgain }) {
 
   const toast = useToast();
 
-  // Setting up Socket IO
+  // Setting up Socket IO, Connecting to Server and listening for typing event
   useEffect(() => {
     socket = io(ENDPOINT);
     socket.emit("setup", user);
@@ -86,6 +86,10 @@ function ChatOpened({ fetchAgain, setFetchAgain }) {
     setLoading(false);
   };
 
+  /**
+   * @description Sending Message to Selected Chat
+   * @param {Event} e on enter key
+   */
   const sendMessage = async (e) => {
     if (e.key !== "Enter" || !newMessage) return;
 
@@ -119,6 +123,10 @@ function ChatOpened({ fetchAgain, setFetchAgain }) {
     }
   };
 
+  /**
+   * @description Sending Message to Selected Chat
+   * @param {Event} e
+   */
   const typingHandler = async (e) => {
     setNewMessage(e.target.value);
 
@@ -147,12 +155,14 @@ function ChatOpened({ fetchAgain, setFetchAgain }) {
     }
   };
 
+  // Fetching Messages on Selected Chat Change
   useEffect(() => {
     fetchMessages();
     // This variable is used to decide whether to give notification or not
     selectedChatCompare = selectedChat;
   }, [selectedChat]);
 
+  // Socket IO Stuff , Listening for new messages
   useEffect(() => {
     if (!messages) return;
     socket.on("message received", (newMessageRecieved) => {

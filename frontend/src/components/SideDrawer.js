@@ -157,7 +157,11 @@ function SideDrawer() {
             </Text>
           </Button>
         </Tooltip>
-        <Text fontSize="2xl" fontFamily="Work sans">
+        <Text
+          fontSize={{ base: "16px", md: "2xl" }}
+          fontFamily="Work sans"
+          fontWeight={600}
+        >
           Infinity-Connect
         </Text>
 
@@ -180,8 +184,8 @@ function SideDrawer() {
                     setSelectedChat(notif.chat);
                     setNotification(
                       notification.filter(
-                        (item) => notif.chatId !== item.chatId,
-                      ),
+                        (item) => notif.chatId !== item.chatId
+                      )
                     );
                   }}
                 >

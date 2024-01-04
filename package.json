@@ -2,9 +2,11 @@
   "name": "mern_chat_app",
   "version": "1.0.0",
   "description": "",
-  "main": "server.js",
+  "main": "",
   "scripts": {
-    "start": "nodemon server.js",
+    "start": "node backend/server.js",
+    "server": "nodemon backend/server.js",
+    "build": "npm install --legacy-peer-deps && npm install --legacy-peer-deps --prefix frontend && npm run build --prefix frontend",
     "pretty": "prettier --write \"./**/*.{js,jsx,mjs,cjs,ts,tsx,json}\""
   },
   "author": "Anuj Sharma",
@@ -17,6 +19,7 @@
     "express-async-handler": "^1.2.0",
     "jsonwebtoken": "^9.0.2",
     "mongoose": "^8.0.3",
+    "path": "^0.12.7",
     "prettier": "^3.1.1",
     "react-router-dom": "^5.3.4",
     "socket.io": "^4.7.2"

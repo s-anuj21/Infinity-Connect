@@ -14,6 +14,9 @@ function MyChats({ fetchAgain }) {
   const { user, selectedChat, setSelectedChat, chats, setChats } = ChatState();
   const toast = useToast();
 
+  /**
+   * @description Fetching Chats(All users with whom chat exist, and grps) of Logged In User
+   */
   const fetchChats = async () => {
     try {
       const { data } = await axios({
@@ -36,11 +39,11 @@ function MyChats({ fetchAgain }) {
     }
   };
 
+  // This fetchAgain is used to fetch chats again and will update chats variable when a new msg or chat will be created
+  // And this value will be changed in chatbox component
   useEffect(() => {
     fetchChats();
   }, [fetchAgain]);
-  // This fetchAgain is used to fetch chats again and will update chats variable when a new msg or chat will be created
-  // And this value will be changed in chatbox component
 
   return (
     <Box

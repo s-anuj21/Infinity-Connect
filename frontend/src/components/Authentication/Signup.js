@@ -26,7 +26,8 @@ function Signup() {
 
   const toast = useToast();
 
-  const postDetails = async (pics) => {
+  // Upload Profile Picture on Cloudinary
+  const uploadProfilePic = async (pics) => {
     setLoading(true);
 
     if (pics === undefined) {
@@ -52,7 +53,7 @@ function Signup() {
           {
             method: "post",
             body: data,
-          },
+          }
         );
 
         const result = await res.json();
@@ -78,6 +79,8 @@ function Signup() {
       setLoading(false);
     }
   };
+
+  // Signup User Submit
   const submitHandler = async () => {
     setLoading(true);
     if (!name || !email || !password || !cpassword) {
@@ -183,7 +186,7 @@ function Signup() {
           accept="image/*"
           onChange={(e) => {
             // Just taking the first img, even if multiple are selected
-            postDetails(e.target.files[0]);
+            uploadProfilePic(e.target.files[0]);
           }}
         />
       </FormControl>

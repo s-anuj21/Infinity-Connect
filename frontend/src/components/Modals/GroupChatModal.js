@@ -13,6 +13,7 @@ import {
   Input,
   useToast,
   Box,
+  Spinner,
 } from "@chakra-ui/react";
 import axios from "axios";
 import { useState } from "react";
@@ -81,7 +82,7 @@ function GroupChatModal({ children }) {
    */
   const handleDelete = (userToDelete) => {
     setSelectedUsers(
-      selectedUsers.filter((user) => user._id !== userToDelete._id),
+      selectedUsers.filter((user) => user._id !== userToDelete._id)
     );
   };
 
@@ -186,8 +187,7 @@ function GroupChatModal({ children }) {
               ))}
             </Box>
             {loading ? (
-              // <ChatLoading />
-              <div>Loading...</div>
+              <Spinner size="lg" marginTop="15px" />
             ) : (
               searchResult
                 ?.slice(0, 4)

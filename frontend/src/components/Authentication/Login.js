@@ -43,8 +43,6 @@ function Login() {
         },
       });
 
-      console.log(res.data);
-
       if (res.data.status === "success") {
         toast({
           title: "Login Successful",

@@ -21,7 +21,6 @@ import { useState } from "react";
 import { ChatState } from "../Context/ChatProvider";
 import UserBadgeItem from "../Utilities/UserBadgeItem";
 import UserListItem from "../Utilities/UserListItem";
-import { set } from "mongoose";
 
 const UpdateGroupChatModal = ({ fetchMessages, fetchAgain, setFetchAgain }) => {
   const { isOpen, onOpen, onClose } = useDisclosure();
@@ -279,7 +278,7 @@ const UpdateGroupChatModal = ({ fetchMessages, fetchAgain, setFetchAgain }) => {
             </FormControl>
 
             {loading ? (
-              <Spinner size="lg" />
+              <Spinner size="lg" marginTop="15px" />
             ) : (
               searchResult?.map((user) => (
                 <UserListItem
