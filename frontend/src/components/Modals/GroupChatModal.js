@@ -81,7 +81,7 @@ function GroupChatModal({ children }) {
    */
   const handleDelete = (userToDelete) => {
     setSelectedUsers(
-      selectedUsers.filter((user) => user._id !== userToDelete._id)
+      selectedUsers.filter((user) => user._id !== userToDelete._id),
     );
   };
 

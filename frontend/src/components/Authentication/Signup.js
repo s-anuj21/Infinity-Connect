@@ -52,7 +52,7 @@ function Signup() {
           {
             method: "post",
             body: data,
-          }
+          },
         );
 
         const result = await res.json();

@@ -180,8 +180,8 @@ function SideDrawer() {
                     setSelectedChat(notif.chat);
                     setNotification(
                       notification.filter(
-                        (item) => notif.chatId !== item.chatId
-                      )
+                        (item) => notif.chatId !== item.chatId,
+                      ),
                     );
                   }}
                 >

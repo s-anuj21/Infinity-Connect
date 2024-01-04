@@ -46,7 +46,7 @@ const accessChat = asyncHandler(async (req, res) => {
 
   createdChat = await Chat.find({ _id: createdChat._id }).populate(
     "users",
-    "-password"
+    "-password",
   );
 
   res.status(200).json(createdChat);
@@ -112,7 +112,7 @@ const renameGroup = asyncHandler(async (req, res) => {
   const updatedGroup = await Chat.findByIdAndUpdate(
     chatId,
     { chatName },
-    { new: true }
+    { new: true },
   )
     .populate("users", "-password")
     .populate("groupAdmin", "-password");
@@ -138,7 +138,7 @@ const addToGroup = asyncHandler(async (req, res) => {
     { $push: { users: userId } },
     {
       new: true,
-    }
+    },
   )
     .populate("users", "-password")
     .populate("groupAdmin", "-password");
@@ -165,7 +165,7 @@ const removeFromGroup = asyncHandler(async (req, res) => {
     { $pull: { users: userId } },
     {
       new: true,
-    }
+    },
   )
     .populate("users", "-password")
     .populate("groupAdmin", "-password");
